@@ -1,29 +1,59 @@
-name: Python Matrix Strategy
+# Name of the workflow
+name: Python Matrix Build
 
+# Events that trigger the workflow
 on:
   push:
     branches:
-      - main
+      - main # Trigger on push to the main branch
   pull_request:
+    branches:
+      - main # Trigger on pull request to the main branch
 
+# Define the jobs to be executed
 jobs:
+  # Define a job named 'build'
   build:
-    runs-on: ${{ matrix.os }}
+    # Define the matrix strategy for this job
     strategy:
       matrix:
+        # Define the operating systems to run on
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        # Define the Python versions to install
+        python-version: [3.9, '3.10', '3.11', '3.12'] # Use strings for versions to avoid YAML parsing issues
 
-    name: Build on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+    # Specify the runner environment based on the 'os' matrix variable
+    runs-on: ${{ matrix.os }}
 
+    # Define the steps for the 'build' job
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Step 1: Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Action to checkout your repository code
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      # Step 2: Set up Python environment
+      # This step uses the 'setup-python' action to install the specified Python version
+      - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+        uses: actions/setup-python@v5 # Action to set up Python
+        with:
+          python-version: ${{ matrix.python-version }} # Use the Python version from the matrix
 
-    - name: Verify Python version
-      run: python --version
+      # Step 3: Display the installed Python version
+      # This step runs a command to show which Python version is active
+      - name: Display Python version
+        run: python --version # Command to print the Python version
+
+      # Step 4: Install dependencies (optional, but good practice for real projects)
+      # This step would typically install project dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip # Upgrade pip
+          # if -f requirements.txt; then pip install -r requirements.txt; fi # Uncomment for real projects
+
+      # Step 5: Run tests (placeholder for your actual tests)
+      # This step is where you would execute your project's tests
+      - name: Run tests
+        run: |
+          echo "Running tests for Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+          # For example: python -m pytest # Uncomment for real projects if you use pytest
+          # Or: python your_script.py # Run a simple script
